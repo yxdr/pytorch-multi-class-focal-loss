@@ -16,7 +16,7 @@ class FocalLoss:
 
         elif self.alpha_t is not None and self.gamma == 0:
             if self.alpha_t.device != outputs.device:
-                self.alpha_t.to(outputs)
+                self.alpha_t = self.alpha_t.to(outputs)
             focal_loss = torch.nn.functional.cross_entropy(outputs, targets,
                                                            weight=self.alpha_t)
 
@@ -27,7 +27,7 @@ class FocalLoss:
 
         elif self.alpha_t is not None and self.gamma != 0:
             if self.alpha_t.device != outputs.device:
-                self.alpha_t.to(outputs)
+                self.alpha_t = self.alpha_t.to(outputs)
             ce_loss = torch.nn.functional.cross_entropy(outputs, targets, reduction='none')
             p_t = torch.exp(-ce_loss)
             ce_loss = torch.nn.functional.cross_entropy(outputs, targets,
@@ -39,11 +39,10 @@ class FocalLoss:
 
 if __name__ == '__main__':
     outputs = torch.tensor([[2, 1.],
-                            [2.5, 1]])
-    targets = torch.tensor([0, 1])
+                            [2.5, 1]], device='cuda')
+    targets = torch.tensor([0, 1], device='cuda')
     print(torch.nn.functional.softmax(outputs, dim=1))
 
     fl= FocalLoss([0.5, 0.5], 2)
 
     print(fl(outputs, targets))
-
